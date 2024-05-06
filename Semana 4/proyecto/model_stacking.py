@@ -51,7 +51,7 @@ X_val_scaled[cols_to_standardize] = scaler.transform(X_val_scaled[cols_to_standa
 #------------------------ Modelo ensamble --------------------------------
 #-------------------------------------------------------------------------
 
-# Define los hiperparámetros para XGBoost y RandomForest
+# Hiperparametros
 xgb_params = {'n_estimators': 641,
               'max_depth': 10,
               'learning_rate': 0.05064281254955496,
@@ -76,12 +76,12 @@ stacking_model = StackingRegressor(
     final_estimator=LinearRegression()
 )
 # Entrena el modelo de stacking
-stacking_model.fit(X_train_scaled, y_train) 
+stacking_model.fit(X_train, y_train) 
 
 # #-------------------------------------------------------------------------
 # #------------------- Se guarda el modelo con joblib ----------------------
 # #-------------------------------------------------------------------------
-joblib.dump(stacking_model, 'model_deployment/stacking_model.pkl', compress=3)
+joblib.dump(stacking_model, 'stacking_model.pkl', compress=3)
 
 # #-------------------------------------------------------------------------
 # #--------------------------- Creacion API --------------------------------

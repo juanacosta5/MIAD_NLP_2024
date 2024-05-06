@@ -2,10 +2,9 @@ from flask import Flask
 from flask_restx import Api, Resource, fields, reqparse
 from flask_cors import CORS
 import requests
-
+from model_deployment import predict
 app = Flask(__name__)
-CORS(app)  # Habilitar CORS para todas las rutas y orígenes
-
+CORS(app)  
 api = Api(
     app, 
     version='1.0', 
@@ -32,7 +31,7 @@ parser.add_argument(
     'State', 
     type=int, 
     required=True, 
-    help='Estado del automóvil', 
+    help='Estado en el que se encuentra del automóvil', 
     location='args')
 parser.add_argument(
     'Make', 
@@ -51,7 +50,7 @@ resource_fields = api.model('Resource', {
     'result': fields.Float,
 })
 
-@ns.route('/')
+@ns.route('/cost-prediction')
 class CarPricePrediction(Resource):
 
     @api.doc(parser=parser)
@@ -64,9 +63,13 @@ class CarPricePrediction(Resource):
         state = args['State']
         make = args['Make']
         model = args['Model']
-        
-        # Hacer una solicitud POST al servicio de predicción
-        prediction_service_url = "http://localhost:5000/predict"
+        print(year)
+        print(mileage)
+        print(state)
+        print(make)
+        print(model)
+
+        # prediction_service_url = "http://localhost:5000/predict"
         data = {
             'Year': year,
             'Mileage': mileage,
@@ -74,10 +77,11 @@ class CarPricePrediction(Resource):
             'Make': make,
             'Model': model
         }
-        response = requests.post(prediction_service_url, json=data)
+        response = predict(data)
+        print (response)
         
-        if response.status_code == 200:
-            result = response.json()['prediction']
+        if response[1] == 200:
+            result = response[0]
             return {'result': result}, 200
         else:
             return {'error': 'No se pudo realizar la predicción'}, 500

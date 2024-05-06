@@ -1,29 +1,33 @@
-from flask import Flask, request, jsonify
-import pandas as pd
 import joblib
 import os
+import sys
+import pandas as pd
 
-app = Flask(__name__)
+clf = joblib.load('stacking_model.pkl')
 
-# Cargar el modelo al inicio de la aplicación
-clf = joblib.load(r'C:\Users\jacosta\Documents\GitHub\Mis Repos\MIAD_NLP_2024\Semana 4\proyecto\stacking_model.pkl')
-
-@app.route('/predict', methods=['POST'])
-def predict():
+def predict(data):
     try:
-        # Obtener datos de la solicitud como JSON
-        data = request.get_json()
-
-        # Convertir a DataFrame
+        # cargamos
         input_data = pd.DataFrame([data])
 
-        # Realizar predicción
+        # predecimos
         prediction = clf.predict(input_data)
 
-        # Devolver resultado como JSON
-        return jsonify({'prediction': prediction.tolist()}), 200
+        # resultado
+        return prediction[0],200
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        return "Error ",500
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    
+    if len(sys.argv) == 1:
+        print('Please add data')
+        
+    else:
+
+        data = sys.argv[1]
+
+        p1 = predict(data)
+        
+        print(data)
+        print('Price of Car: ', p1)
